@@ -1,24 +1,17 @@
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-import express, { type Express } from "express";
-import fs from "fs";
-import path from "path";
-
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
+
+  // Se o frontend não existir, não quebra o backend
   if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    console.warn(
+      "[static] Frontend build não encontrado, servindo apenas API."
     );
+    return;
   }
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
+  // fallback para SPA
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
