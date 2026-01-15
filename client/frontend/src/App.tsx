@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 function App() {
-  const [status, setStatus] = useState("Conectando...");
+  const [status, setStatus] = useState("Carregando...");
 
   useEffect(() => {
     fetch("https://sistema-cadastro-o7x0.onrender.com")
@@ -10,8 +10,8 @@ function App() {
   }, []);
 
   return (
-    <div style={{ padding: 40, fontFamily: "sans-serif" }}>
-      <h1>Frontend Vite + React 🚀</h1>
+    <div style={{ padding: 40 }}>
+      <h1>Frontend no Vite 🚀</h1>
       <p>{status}</p>
     </div>
   );

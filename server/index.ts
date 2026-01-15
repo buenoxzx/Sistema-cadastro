@@ -1,13 +1,21 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
+const cors = require("cors");
 import { registerRoutes } from "./routes";
 
 const app = express();
 const httpServer = createServer(app);
 
 /* =======================
-   Middlewares básicos
+   Middlewares globais
 ======================= */
+
+app.use(
+  cors({
+    origin: "*", // em produção você pode restringir
+    credentials: true,
+  })
+);
 
 app.use(
   express.json({
@@ -38,7 +46,7 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
+    if (path.startsWith("/api") || path === "/health") {
       log(`${req.method} ${path} ${res.statusCode} - ${duration}ms`);
     }
   });
@@ -47,20 +55,32 @@ app.use((req, res, next) => {
 });
 
 /* =======================
-   Rotas
+   Rotas base
+======================= */
+
+// Rota raiz (evita "Cannot GET /")
+app.get("/", (_req, res) => {
+  res.json({
+    status: "ok",
+    message: "Backend online 🚀",
+  });
+});
+
+// Health check (usada por frontend, monitoramento, etc.)
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+/* =======================
+   Inicialização
 ======================= */
 
 (async () => {
-  // Rotas da API
+  // Rotas da API (/api/...)
   await registerRoutes(httpServer, app);
 
-  // Health check (IMPORTANTE)
-  app.get("/health", (_req, res) => {
-    res.status(200).json({ status: "ok" });
-  });
-
   /* =======================
-     Error handler
+     Error handler (SEMPRE por último)
   ======================= */
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -70,10 +90,6 @@ app.use((req, res, next) => {
       message: err.message || "Internal Server Error",
     });
   });
-
-  /* =======================
-     Start server
-  ======================= */
 
   const port = Number(process.env.PORT) || 5000;
 
