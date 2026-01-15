@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
-const cors = require("cors");
+import cors from "cors";
 import { registerRoutes } from "./routes";
 
 const app = express();
@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api") || path === "/health") {
+    if (path.startsWith("/api") || path === "/" || path === "/health") {
       log(`${req.method} ${path} ${res.statusCode} - ${duration}ms`);
     }
   });
@@ -66,7 +66,7 @@ app.get("/", (_req, res) => {
   });
 });
 
-// Health check (usada por frontend, monitoramento, etc.)
+// Health check
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
