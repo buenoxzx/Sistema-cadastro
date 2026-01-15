@@ -1,0 +1,12 @@
+## Sistema de Cadastro
+
+### Backend
+- Node.js
+- Express
+- PostgreSQL (Neon)
+- Deploy: Render
+
+### Frontend
+- React
+- Vite
+- Deploy: Vercel
